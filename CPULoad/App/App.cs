@@ -26,17 +26,25 @@ SOFTWARE.
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CPULoad.App.Services.CPU;
+using CPULoad.App.Services.CPU.WMI;
 using CPULoad.Engine;
 
 namespace CPULoad.App
 {
-    public class App
+    public class App : IDisposable
     {
-        private static Task _workerTask;
+        #region System
 
-        private readonly NotifyIcon _trayIcon = new NotifyIcon { Text = "CPULoad by Artemov Ivan", Visible = true};
+        private Task _workerTask;
 
-        private static readonly IconGenerator IconGenerator = new IconGenerator();
+        private readonly NotifyIcon _trayIcon = new NotifyIcon { Text = @"CPULoad by Artemov Ivan", Visible = true };
+        
+        #endregion
+
+        readonly ICpuProvider _cpuService = new WmiCounterCpuService();
+
+        private readonly IconGenerator _iconGenerator = new IconGenerator();
 
         public void Start()
         {
@@ -45,19 +53,17 @@ namespace CPULoad.App
             _workerTask = Task.Factory.StartNew(Task_Worker);
         }
 
-        private void Task_Worker()
+        private async void Task_Worker()
         {
             if (_trayIcon == null)
                 return;
 
             while (true)
             {
-                var processorValue = ProcessorUtilities.GetCpuUsage();
+                var processorLoadValue = await _cpuService.GetCurrentLoadAsync();
 
-                var newGeneratedIcon = IconGenerator.GetIcon(processorValue);
-
-                _trayIcon.Icon = newGeneratedIcon;
-                _trayIcon.Text = "Processor Load: " + processorValue + "%";
+                _trayIcon.Icon = _iconGenerator.GetIcon(processorLoadValue);
+                _trayIcon.Text = @"Processor Load: " + processorLoadValue + "%";
             }
         }
 
@@ -65,10 +71,10 @@ namespace CPULoad.App
         {
             var contextMenu = new ContextMenu();
 
-            var menuAbout = new MenuItem { Index = 0, Text = "About" };
+            var menuAbout = new MenuItem { Index = 0, Text = @"About" };
             menuAbout.Click += menuAbout_Click;
 
-            var menuExit = new MenuItem { Index = 1, Text = "E&xit" };
+            var menuExit = new MenuItem { Index = 1, Text = @"E&xit" };
             menuExit.Click += menuExit_Click;
 
             contextMenu.MenuItems.AddRange(new[] { menuAbout, menuExit });
@@ -77,14 +83,21 @@ namespace CPULoad.App
         }
 
 
-        private static void menuAbout_Click(object sender, EventArgs e)
+        private void menuAbout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Created by Artemov Ivan\r\n\r\nzoxexivo@gmail.com", "CPULoad 2.0");
+            MessageBox.Show("Created by Artemov Ivan\r\n\r\nzoxexivo@gmail.com", @"CPULoad 2.5");
         }
 
-        private static void menuExit_Click(object Sender, EventArgs e)
+        private void menuExit_Click(object Sender, EventArgs e)
         {
-            IconGenerator.Dispose();
+            Dispose();
+
+            Application.Exit();
+        }
+
+        public void Dispose()
+        {
+            _iconGenerator.Dispose();
 
             try
             {
@@ -94,8 +107,6 @@ namespace CPULoad.App
             {
                 // ignored
             }
-
-            Application.Exit();
         }
     }
 }

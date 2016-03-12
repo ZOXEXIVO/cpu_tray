@@ -56,13 +56,16 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App\App.cs" />
-    <Compile Include="Engine\FontUtilities.cs" />
-    <Compile Include="Engine\IconUtilities.cs" />
-    <Compile Include="Engine\ProcessorUtilities.cs" />
+    <Compile Include="App\Services\CPU\ICpuService.cs" />
+    <Compile Include="App\Services\CPU\PerformanceCounters\PerformanceCounterCpuService.cs" />
+    <Compile Include="App\Services\CPU\WMI\WmiCounterCpuService.cs" />
+    <Compile Include="Utils\FontUtilities.cs" />
+    <Compile Include="Utils\IconUtilities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -102,6 +105,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
