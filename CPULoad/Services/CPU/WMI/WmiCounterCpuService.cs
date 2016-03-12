@@ -23,31 +23,36 @@ SOFTWARE.
 
 */
 
-using System.Drawing;
+using System;
+using System.Linq;
+using System.Management;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace CPULoad.Engine
+namespace CPULoad.Services.CPU.WMI
 {
-    public static class FontUtilities
+    public class WmiCounterCpuService : ICpuProvider
     {
-        public static Font GetFontForSize(int value)
-        {
-            if (value >= 100)
-            {
-                return new Font("Arial", 12);
-            }
+        private static readonly ManagementObjectSearcher WmiObject;
 
-            return new Font("Tahoma", 17);
+        static WmiCounterCpuService()
+        {
+            WmiObject = new ManagementObjectSearcher("SELECT PercentProcessorTime from Win32_PerfFormattedData_PerfOS_Processor WHERE Name = '_Total'");
         }
 
-        public static Color GetBackgroundColor(int value)
+        public Task<int> GetCurrentLoadAsync()
         {
-            if (value > 90)
-                return Color.FromArgb(210, 255, 13, 0);
+            var cpuLoadData = WmiObject.Get().Cast<ManagementObject>().Select(mo => new
+            {
+                LoadPercent = Convert.ToInt32(mo["PercentProcessorTime"])
+            }).FirstOrDefault();
 
-            if (value >= 50)
-                return Color.FromArgb(210, 255, 72, 00);
-            
-            return Color.FromArgb(180, 3, 99, 173);
+            new AutoResetEvent(false).WaitOne(1000);
+
+            if (cpuLoadData == null)
+                Task.FromResult(0);
+
+            return Task.FromResult(cpuLoadData.LoadPercent);
         }
     }
 }

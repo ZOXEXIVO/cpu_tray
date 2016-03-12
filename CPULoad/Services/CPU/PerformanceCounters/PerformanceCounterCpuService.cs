@@ -23,12 +23,28 @@ SOFTWARE.
 
 */
 
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace CPULoad.App.Services.CPU
+namespace CPULoad.Services.CPU.PerformanceCounters
 {
-    public interface ICpuProvider
+    public class PerformanceCounterCpuService : ICpuProvider
     {
-        Task<int> GetCurrentLoadAsync();
+        private static readonly PerformanceCounter CpuCounter;
+
+        static PerformanceCounterCpuService()
+        {
+            CpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+        }
+
+        public Task<int> GetCurrentLoadAsync()
+        {
+            CpuCounter.NextValue();
+
+            new AutoResetEvent(false).WaitOne(1000);
+
+            return Task.FromResult((int)CpuCounter.NextValue());
+        }
     }
 }

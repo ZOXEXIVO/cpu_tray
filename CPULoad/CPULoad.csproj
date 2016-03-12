@@ -61,11 +61,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App\App.cs" />
-    <Compile Include="App\Services\CPU\ICpuService.cs" />
-    <Compile Include="App\Services\CPU\PerformanceCounters\PerformanceCounterCpuService.cs" />
-    <Compile Include="App\Services\CPU\WMI\WmiCounterCpuService.cs" />
-    <Compile Include="Utils\FontUtilities.cs" />
-    <Compile Include="Utils\IconUtilities.cs" />
+    <Compile Include="Services\CPU\ICpuService.cs" />
+    <Compile Include="Services\CPU\PerformanceCounters\PerformanceCounterCpuService.cs" />
+    <Compile Include="Services\CPU\WMI\WmiCounterCpuService.cs" />
+    <Compile Include="Utilities\FontUtilities.cs" />
+    <Compile Include="Utilities\IconUtilities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

@@ -26,9 +26,9 @@ SOFTWARE.
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CPULoad.App.Services.CPU;
-using CPULoad.App.Services.CPU.WMI;
-using CPULoad.Engine;
+using CPULoad.Services.CPU;
+using CPULoad.Services.CPU.WMI;
+using CPULoad.Utilities;
 
 namespace CPULoad.App
 {

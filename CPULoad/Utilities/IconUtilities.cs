@@ -29,7 +29,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 
-namespace CPULoad.Engine
+namespace CPULoad.Utilities
 {
     public class IconGenerator : IDisposable
     {
