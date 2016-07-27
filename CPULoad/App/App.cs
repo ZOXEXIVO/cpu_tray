@@ -24,6 +24,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CPULoad.Services.CPU;
@@ -34,13 +35,16 @@ namespace CPULoad.App
 {
     public class App : IDisposable
     {
-        #region System
+        private readonly Task _applicationTask;
+        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
-        private Task _workerTask;
+        private readonly NotifyIcon _trayIcon;
 
-        private readonly NotifyIcon _trayIcon = new NotifyIcon { Text = @"CPULoad by Artemov Ivan", Visible = true };
-        
-        #endregion
+        public App()
+        {
+            _trayIcon = new NotifyIcon { Text = @"CPULoad by Artemov Ivan", Visible = true };
+            _applicationTask = new Task(Task_Worker, _cts.Token);
+        }
 
         readonly ICpuProvider _cpuService = new WmiCounterCpuService();
 
@@ -50,22 +54,24 @@ namespace CPULoad.App
         {
             InitContextMenu();
 
-            _workerTask = Task.Factory.StartNew(Task_Worker);
+            _applicationTask.Start();
         }
 
         private async void Task_Worker()
         {
-            if (_trayIcon == null)
-                return;
-
             while (true)
             {
+                if(_cts.IsCancellationRequested)
+                    break;
+
                 var processorLoadValue = await _cpuService.GetCurrentLoadAsync();
 
                 _trayIcon.Icon = _iconGenerator.GetIcon(processorLoadValue);
                 _trayIcon.Text = @"Processor Load: " + processorLoadValue + "%";
             }
         }
+        
+        #region UI
 
         private void InitContextMenu()
         {
@@ -95,18 +101,13 @@ namespace CPULoad.App
             Application.Exit();
         }
 
+        #endregion
+
         public void Dispose()
         {
             _iconGenerator.Dispose();
 
-            try
-            {
-                _workerTask.Dispose();
-            }
-            catch
-            {
-                // ignored
-            }
+            _cts.Cancel();
         }
     }
 }
