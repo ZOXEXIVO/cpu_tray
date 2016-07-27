@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 
 namespace CPULoad.Services.CPU.WMI
 {
-    public class WmiCounterCpuService : ICpuProvider
+    public class WmiCounterCpuService : ICpuService
     {
         private static readonly ManagementObjectSearcher WmiObject;
 

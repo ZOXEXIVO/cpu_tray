@@ -27,7 +27,7 @@ using System.Threading.Tasks;
 
 namespace CPULoad.Services.CPU
 {
-    public interface ICpuProvider
+    public interface ICpuService
     {
         Task<int> GetCurrentLoadAsync();
     }

@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 
 namespace CPULoad.Services.CPU.PerformanceCounters
 {
-    public class PerformanceCounterCpuService : ICpuProvider
+    public class PerformanceCounterCpuService : ICpuService
     {
         private static readonly PerformanceCounter CpuCounter;
 
