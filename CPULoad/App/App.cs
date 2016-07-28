@@ -46,9 +46,9 @@ namespace CPULoad.App
             _applicationTask = new Task(Task_Worker, _cts.Token);
         }
 
-        readonly ICpuProvider _cpuService = new WmiCounterCpuService();
+        readonly ICpuService _cpuService = new WmiCounterCpuService();
 
-        private readonly IconGenerator _iconGenerator = new IconGenerator();
+        private readonly IconFlyweightFactory _iconGenerator = new IconFlyweightFactory();
 
         public void Start()
         {
@@ -91,13 +91,12 @@ namespace CPULoad.App
 
         private void menuAbout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Created by Artemov Ivan\r\n\r\nzoxexivo@gmail.com", @"CPULoad 2.5");
+            MessageBox.Show("Created by Artemov Ivan\r\n\r\nzoxexivo@gmail.com", $"CPULoad {Version.CurrentVersion}");
         }
 
         private void menuExit_Click(object Sender, EventArgs e)
         {
             Dispose();
-
             Application.Exit();
         }
 
@@ -106,7 +105,6 @@ namespace CPULoad.App
         public void Dispose()
         {
             _iconGenerator.Dispose();
-
             _cts.Cancel();
         }
     }

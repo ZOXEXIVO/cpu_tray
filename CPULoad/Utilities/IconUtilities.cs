@@ -31,7 +31,7 @@ using System.Runtime.InteropServices;
 
 namespace CPULoad.Utilities
 {
-    public class IconGenerator : IDisposable
+    public class IconFlyweightFactory : IDisposable
     {
         private readonly ConcurrentDictionary<int, Icon> _iconCache = new ConcurrentDictionary<int, Icon>();
         
@@ -63,7 +63,7 @@ namespace CPULoad.Utilities
         }
         
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        extern static bool DestroyIcon(IntPtr handle);
+        static extern bool DestroyIcon(IntPtr handle);
 
         public void Dispose()
         {

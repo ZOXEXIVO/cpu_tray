@@ -40,19 +40,18 @@ namespace CPULoad.Services.CPU.WMI
             WmiObject = new ManagementObjectSearcher("SELECT PercentProcessorTime from Win32_PerfFormattedData_PerfOS_Processor WHERE Name = '_Total'");
         }
 
-        public Task<int> GetCurrentLoadAsync()
+        public async Task<int> GetCurrentLoadAsync()
         {
-            var cpuLoadData = WmiObject.Get().Cast<ManagementObject>().Select(mo => new
-            {
+            var cpuLoadData = WmiObject.Get().Cast<ManagementObject>().Select(mo => new {
                 LoadPercent = Convert.ToInt32(mo["PercentProcessorTime"])
             }).FirstOrDefault();
 
-            new AutoResetEvent(false).WaitOne(1000);
-
             if (cpuLoadData == null)
-                Task.FromResult(0);
+                return 0;
 
-            return Task.FromResult(cpuLoadData.LoadPercent);
+            new AutoResetEvent(false).WaitOne(1000);
+           
+            return await Task.FromResult(cpuLoadData.LoadPercent);
         }
     }
 }
