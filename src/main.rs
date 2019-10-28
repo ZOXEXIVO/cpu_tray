@@ -1,12 +1,16 @@
 mod cpu;
 mod tray;
 mod icon;
+mod console;
 
 use cpu::Cpu;
 use tray::TrayIcon;
 use icon::IconGenerator;
+use console::Console;
 
 fn main() {
+    Console::hide();
+
     let default_tooltip = "CpuTray by Artemov Ivan (zoxexivo@gmail.com)".to_string();
 
     let mut tray_icon = TrayIcon::new(
