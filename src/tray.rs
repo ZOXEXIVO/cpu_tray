@@ -3,7 +3,6 @@ extern crate winapi;
 use std::ffi::OsStr;
 use std::mem::{size_of, zeroed};
 use std::os::windows::ffi::OsStrExt;
-use std::ptr::null_mut;
 
 use crate::IconGenerator;
 
@@ -22,14 +21,13 @@ impl TrayIcon {
         }
     }
 
-    fn create_icon(trayToolTip: String) -> winapi::um::shellapi::NOTIFYICONDATAW {
-        let mut trayToolTipInt: [u16; 128] = [0; 128];
+    fn create_icon(tray_tool_tip: String) -> winapi::um::shellapi::NOTIFYICONDATAW {
+        let mut tray_tool_tip_int: [u16; 128] = [0; 128];
 
-        let trayToolTipStrStep: &str = &*trayToolTip;
-        let mut trayToolTipStepOS = OsStr::new(trayToolTipStrStep);
-        let trayToolTipStepUTF16 = trayToolTipStepOS.encode_wide().collect::<Vec<u16>>();
+        let tray_tool_tip_step_os = OsStr::new(&*tray_tool_tip);
+        let tray_tool_tip_step_utf16 = tray_tool_tip_step_os.encode_wide().collect::<Vec<u16>>();
 
-        trayToolTipInt[..trayToolTipStepUTF16.len()].copy_from_slice(&trayToolTipStepUTF16);
+        tray_tool_tip_int[..tray_tool_tip_step_utf16.len()].copy_from_slice(&tray_tool_tip_step_utf16);
 
         let mut nid: winapi::um::shellapi::NOTIFYICONDATAW = unsafe { zeroed() };
         unsafe {
@@ -40,7 +38,7 @@ impl TrayIcon {
 
             nid.hIcon = IconGenerator::new().generate(0);
 
-            nid.szTip = trayToolTipInt;
+            nid.szTip = tray_tool_tip_int;
             nid.uFlags = winapi::um::shellapi::NIF_MESSAGE
                 | winapi::um::shellapi::NIF_ICON
                 | winapi::um::shellapi::NIF_TIP;

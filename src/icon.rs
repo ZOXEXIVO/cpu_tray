@@ -3,10 +3,10 @@ extern crate rusttype;
 
 use image::{Rgba, RgbaImage};
 use imageproc::drawing::draw_text_mut;
+use image::imageops::resize;
 use rusttype::{FontCollection, Scale};
 
 use std::mem::{size_of, zeroed};
-use std::os::windows::ffi::OsStrExt;
 use std::ptr::null_mut;
 use winapi::shared::windef::HICON__ as HICON;
 
@@ -26,7 +26,7 @@ impl IconGenerator {
     }
 
     pub fn generate(&mut self, value: u8) -> GeneratedIcon {
-        if (self.icon_cache.contains_key(&value)) {
+        if self.icon_cache.contains_key(&value) {
             return self.icon_cache[&value];
         } else {
             let new_icon = IconGenerator::create_icon(value);
@@ -40,13 +40,13 @@ impl IconGenerator {
     fn get_scale_params(n: usize) -> ((u32, u32), Scale){
         match n{
             1 => {
-                ((8, 0) ,Scale { x: 30.0, y: 30.0 })                
+                ((12, 0), Scale { x: 64.0, y: 64.0 })                
             },
             2 => {
-                 ((0, 0) ,Scale { x: 30.0, y: 30.0 })         
+                 ((0, 0), Scale { x: 60.0, y: 60.0 })         
             },
             _ => {
-                 ((0, 5) ,Scale { x: 20.0, y: 20.0 })         
+                 ((0, 10), Scale { x: 40.0, y: 40.0 })         
             }
         }
     }
@@ -54,7 +54,7 @@ impl IconGenerator {
     fn create_icon(value: u8) -> GeneratedIcon {
         let value_to_draw = value.to_string();
 
-        let mut image = RgbaImage::new(32, 32);
+        let mut image = RgbaImage::new(64, 64);
 
         let font = FontCollection::from_bytes(Vec::from(include_bytes!("fonts/DejaVuSans.ttf") as &[u8]))
             .unwrap()
@@ -74,19 +74,26 @@ impl IconGenerator {
             &value_to_draw
         );
 
+        let resized_image = resize(
+            &mut image,
+            16,
+            16,
+            image::imageops::FilterType::Lanczos3
+        );
+
         unsafe {
             let hbm_mask = winapi::um::wingdi::CreateCompatibleBitmap(
                 winapi::um::winuser::GetDC(null_mut()),
-                32,
-                32,
+                16,
+                16,
             );
 
-            let bytes_raw = image.into_raw().as_mut_ptr();
+            let bytes_raw = resized_image.into_raw().as_mut_ptr();
 
             let transmuted = std::mem::transmute::<*mut u8, *mut winapi::ctypes::c_void>(bytes_raw);
 
             let bitmap: winapi::shared::windef::HBITMAP =
-                winapi::um::wingdi::CreateBitmap(32, 32, 2, 16, transmuted);
+                winapi::um::wingdi::CreateBitmap(16, 16, 2, 16, transmuted);
 
             let mut h_icon = winapi::um::winuser::ICONINFO {
                 fIcon: 1,
