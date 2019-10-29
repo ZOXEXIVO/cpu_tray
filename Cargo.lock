@@ -78,7 +78,7 @@ dependencies = [
 
 [[package]]
 name = "cputray"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "cpu-monitor 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "image 0.22.3 (registry+https://github.com/rust-lang/crates.io-index)",

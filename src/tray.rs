@@ -50,9 +50,9 @@ impl TrayIcon {
     }
 
     pub fn update(&mut self, value: u8) {
-        if self.current_value == value {
-            return;
-        }
+        // if self.current_value == value {
+        //     return;
+        // }
 
         self.nid.hIcon = self.icon_generator.generate(value);
 

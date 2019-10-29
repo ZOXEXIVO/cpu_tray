@@ -40,13 +40,13 @@ impl IconGenerator {
     fn get_scale_params(n: usize) -> ((u32, u32), Scale){
         match n{
             1 => {
-                ((12, 0), Scale { x: 64.0, y: 64.0 })                
+                ((24, 0), Scale { x: 128.0, y: 128.0 })                
             },
             2 => {
-                 ((0, 0), Scale { x: 60.0, y: 60.0 })         
+                 ((0, 0), Scale { x: 120.0, y: 120.0 })         
             },
             _ => {
-                 ((0, 10), Scale { x: 40.0, y: 40.0 })         
+                 ((0, 20), Scale { x: 80.0, y: 80.0 })         
             }
         }
     }
@@ -54,9 +54,9 @@ impl IconGenerator {
     fn create_icon(value: u8) -> GeneratedIcon {
         let value_to_draw = value.to_string();
 
-        let mut image = RgbaImage::new(64, 64);
+        let mut image = RgbaImage::new(128, 128);
 
-        let font = FontCollection::from_bytes(Vec::from(include_bytes!("fonts/DejaVuSans.ttf") as &[u8]))
+        let font = FontCollection::from_bytes(Vec::from(include_bytes!("fonts/Arial.ttf") as &[u8]))
             .unwrap()
             .into_font()
             .unwrap();
@@ -76,16 +76,16 @@ impl IconGenerator {
 
         let resized_image = resize(
             &mut image,
-            16,
-            16,
+            32,
+            32,
             image::imageops::FilterType::Lanczos3
         );
 
         unsafe {
             let hbm_mask = winapi::um::wingdi::CreateCompatibleBitmap(
                 winapi::um::winuser::GetDC(null_mut()),
-                16,
-                16,
+                32,
+                32,
             );
 
             let bytes_raw = resized_image.into_raw().as_mut_ptr();
@@ -93,7 +93,7 @@ impl IconGenerator {
             let transmuted = std::mem::transmute::<*mut u8, *mut winapi::ctypes::c_void>(bytes_raw);
 
             let bitmap: winapi::shared::windef::HBITMAP =
-                winapi::um::wingdi::CreateBitmap(16, 16, 2, 16, transmuted);
+                winapi::um::wingdi::CreateBitmap(32, 32, 2, 16, transmuted);
 
             let mut h_icon = winapi::um::winuser::ICONINFO {
                 fIcon: 1,
