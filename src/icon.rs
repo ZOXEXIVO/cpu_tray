@@ -1,10 +1,7 @@
-extern crate imageproc;
-extern crate rusttype;
-
 use image::{Rgba, RgbaImage};
 use imageproc::drawing::draw_text_mut;
 use image::imageops::resize;
-use rusttype::{FontCollection, Scale};
+use rusttype::{Scale, Font};
 
 use std::mem::{size_of, zeroed};
 use std::ptr::null_mut;
@@ -55,11 +52,8 @@ impl IconGenerator {
         let value_to_draw = value.to_string();
 
         let mut image = RgbaImage::new(128, 128);
-
-        let font = FontCollection::from_bytes(Vec::from(include_bytes!("fonts/Arial.ttf") as &[u8]))
-            .unwrap()
-            .into_font()
-            .unwrap();
+            
+        let font = Font::try_from_bytes(include_bytes!("fonts/Arial.ttf")).unwrap();
 
         let scale_params = IconGenerator::get_scale_params(value_to_draw.len());            
 

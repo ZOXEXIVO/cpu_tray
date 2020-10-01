@@ -16,7 +16,7 @@ impl TrayIcon {
     pub fn new(tooltip: String, icon_generator: IconGenerator) -> Self {
         TrayIcon {
             current_value: 0,
-            icon_generator: icon_generator,
+            icon_generator,
             nid: TrayIcon::create_icon(tooltip),
         }
     }
@@ -50,10 +50,6 @@ impl TrayIcon {
     }
 
     pub fn update(&mut self, value: u8) {
-        // if self.current_value == value {
-        //     return;
-        // }
-
         self.nid.hIcon = self.icon_generator.generate(value);
 
         self.current_value = value;
