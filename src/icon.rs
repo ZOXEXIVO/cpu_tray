@@ -2,10 +2,7 @@ use image::{Rgba, RgbaImage};
 use imageproc::drawing::draw_text_mut;
 use image::imageops::resize;
 use rusttype::{Scale, Font};
-
-use std::mem::{size_of, zeroed};
 use std::ptr::null_mut;
-use winapi::shared::windef::HICON__ as HICON;
 
 use std::collections::HashMap;
 
