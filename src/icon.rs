@@ -6,10 +6,10 @@ use std::ptr::null_mut;
 
 use std::collections::HashMap;
 
-type GeneratedIcon = *mut winapi::shared::windef::HICON__;
+pub type GeneratedIcon = *mut winapi::shared::windef::HICON__;
 
 pub struct IconGenerator {
-    icon_cache: HashMap<u8, GeneratedIcon>
+    icon_cache: HashMap<u8, GeneratedIcon>,
 }
 
 impl IconGenerator {
@@ -20,7 +20,7 @@ impl IconGenerator {
     }
 
     pub fn generate(&mut self, value: u8) -> GeneratedIcon {
-        if self.icon_cache.contains_key(&value) {
+        if self.icon_cache.contains_key(&value) && value != 0 {
             return self.icon_cache[&value];
         } else {
             let new_icon = IconGenerator::create_icon(value);
@@ -31,16 +31,16 @@ impl IconGenerator {
         }
     }
 
-    fn get_scale_params(n: usize) -> ((u32, u32), Scale){
-        match n{
+    fn scale_params(n: usize) -> ((u32, u32), Scale) {
+        match n {
             1 => {
-                ((24, 0), Scale { x: 128.0, y: 128.0 })                
-            },
+                ((24, 0), Scale { x: 128.0, y: 128.0 })
+            }
             2 => {
-                 ((0, 0), Scale { x: 120.0, y: 120.0 })         
-            },
+                ((0, 0), Scale { x: 120.0, y: 120.0 })
+            }
             _ => {
-                 ((0, 20), Scale { x: 80.0, y: 80.0 })         
+                ((0, 20), Scale { x: 80.0, y: 80.0 })
             }
         }
     }
@@ -49,10 +49,10 @@ impl IconGenerator {
         let value_to_draw = value.to_string();
 
         let mut image = RgbaImage::new(128, 128);
-            
+
         let font = Font::try_from_bytes(include_bytes!("fonts/Arial.ttf")).unwrap();
 
-        let scale_params = IconGenerator::get_scale_params(value_to_draw.len());            
+        let scale_params = IconGenerator::scale_params(value_to_draw.len());
 
         let coord = scale_params.0;
 
@@ -62,14 +62,14 @@ impl IconGenerator {
             coord.0, coord.1,
             scale_params.1,
             &font,
-            &value_to_draw
+            &value_to_draw,
         );
 
         let resized_image = resize(
             &mut image,
             32,
             32,
-            image::imageops::FilterType::Lanczos3
+            image::imageops::FilterType::Lanczos3,
         );
 
         unsafe {
