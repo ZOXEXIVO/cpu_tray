@@ -20,7 +20,7 @@ impl IconGenerator {
     }
 
     pub fn generate(&mut self, value: u8) -> GeneratedIcon {
-        if self.icon_cache.contains_key(&value) && value != 0 {
+        if self.icon_cache.contains_key(&value) {
             return self.icon_cache[&value];
         } else {
             let new_icon = IconGenerator::create_icon(value);
