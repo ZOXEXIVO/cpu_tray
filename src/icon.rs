@@ -31,7 +31,7 @@ impl IconGenerator {
         }
     }
 
-    fn scale_params(n: usize) -> ((u32, u32), Scale) {
+    fn scale_params(n: usize) -> ((i32, i32), Scale) {
         match n {
             1 => {
                 ((24, 0), Scale { x: 128.0, y: 128.0 })

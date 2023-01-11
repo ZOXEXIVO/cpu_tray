@@ -30,7 +30,7 @@ impl TrayIcon {
         let mut nid: winapi::um::shellapi::NOTIFYICONDATAW = unsafe { zeroed() };
         unsafe {
             nid.cbSize = size_of::<winapi::um::shellapi::NOTIFYICONDATAW>() as u32;
-            nid.hWnd = std::mem::transmute::<*mut std::ffi::c_void, HWND>(parent_window.hwnd());
+            nid.hWnd = std::mem::transmute::<isize, winapi::shared::windef::HWND>(parent_window.hwnd());
             
             nid.hIcon = IconGenerator::new().generate(0);
 

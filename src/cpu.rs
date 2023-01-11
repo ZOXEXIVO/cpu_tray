@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use cpu_monitor::CpuInstant;
 
-const DEFAULT_DURATION: Duration = Duration::from_millis(700);
+const DEFAULT_DURATION: Duration = Duration::from_millis(500);
 
 pub struct Cpu;
 
