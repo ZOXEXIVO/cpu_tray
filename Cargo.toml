@@ -1,9 +1,9 @@
 [package]
 name = "cputray"
-version = "0.8.0"
+version = "0.9.0"
 description = "Display CPU load in Windows Tray"
 repository = "https://github.com/ZOXEXIVO/cpu_tray"
-authors = ["Artemov Ivan  <zoxexivo@gmail.com>"]
+authors = ["Artemov Ivan <zoxexivo@gmail.com>"]
 edition = "2021"
 
 [dependencies]
