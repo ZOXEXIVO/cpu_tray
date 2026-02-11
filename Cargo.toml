@@ -8,9 +8,9 @@ edition = "2021"
 
 [dependencies]
 cpu-monitor = "0.1.1"
-imageproc = "0.23.0"
-image = "0.24.5"
-rusttype = "0.9.3"
-winit = "0.27.5"
-[target.'cfg(windows)'.dependencies]
+imageproc = "0.26.0"
+image = "0.25.9"
+ab_glyph = "0.2"
+raw-window-handle = "0.6"
+winit = "0.30.12"
 winapi = { version = "0.3.9", features = ["winuser","wincon","shellapi"] }

@@ -3,10 +3,11 @@ use std::collections::HashMap;
 use std::ffi::{OsStr};
 use std::mem::{size_of, zeroed};
 use std::os::windows::ffi::OsStrExt;
-
-use crate::IconGenerator;
-use winapi::shared::windef::{HWND};
-use winit::platform::windows::WindowExtWindows;
+use winapi::shared::guiddef::GUID;
+use winapi::um::shellapi::*;
+use winapi::um::winuser::WM_USER;
+use crate::icon::IconGenerator;
+use raw_window_handle::{HasWindowHandle, RawWindowHandle};
 use winit::window::Window;
 
 pub struct TrayIcon {
@@ -26,33 +27,57 @@ impl TrayIcon {
         }
     }
 
-    fn create_icon(parent_window: &Window) -> winapi::um::shellapi::NOTIFYICONDATAW {
-        let mut nid: winapi::um::shellapi::NOTIFYICONDATAW = unsafe { zeroed() };
-        unsafe {
-            nid.cbSize = size_of::<winapi::um::shellapi::NOTIFYICONDATAW>() as u32;
-            nid.hWnd = std::mem::transmute::<isize, winapi::shared::windef::HWND>(parent_window.hwnd());
-            
-            nid.hIcon = IconGenerator::new().generate(0);
+    fn create_icon(parent_window: &Window) -> NOTIFYICONDATAW {
+        let mut nid: NOTIFYICONDATAW = unsafe { zeroed() };
 
-            nid.uFlags = winapi::um::shellapi::NIF_GUID | winapi::um::shellapi::NIF_ICON;
+        let hwnd = match parent_window.window_handle().unwrap().as_raw() {
+            RawWindowHandle::Win32(handle) => handle.hwnd.get() as _,
+            _ => panic!("unsupported platform"),
         };
 
-        unsafe { winapi::um::shellapi::Shell_NotifyIconW(winapi::um::shellapi::NIM_ADD, &mut nid) };
+        nid.cbSize = size_of::<NOTIFYICONDATAW>() as u32;
+        nid.hWnd = hwnd;
+
+        // REQUIRED when using NIF_GUID
+        nid.guidItem = GUID {
+            Data1: 0x12345678,
+            Data2: 0x1234,
+            Data3: 0x5678,
+            Data4: [0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0],
+        };
+
+        nid.hIcon = IconGenerator::new().generate(0);
+
+        nid.uCallbackMessage = WM_USER + 1;
+
+        nid.uFlags = NIF_GUID | NIF_ICON | NIF_MESSAGE;
+
+        let ok = unsafe { Shell_NotifyIconW(NIM_ADD, &mut nid) };
+
+        // REQUIRED on Windows 10+
+        unsafe {
+            *nid.u.uVersion_mut() = winapi::um::shellapi::NOTIFYICON_VERSION_4;
+            Shell_NotifyIconW(NIM_SETVERSION, &mut nid);
+        }
 
         nid
-    }    
+    }
 
     pub fn update(&mut self, value: u8) {
         self.nid.hIcon = self.icon_generator.generate(value);
-        self.nid.szTip = self.tooltip_generator.generate_tooltip(format!("CPU: {}%", value));
-                
-        self.nid.uFlags = winapi::um::shellapi::NIF_ICON | winapi::um::shellapi::NIF_TIP;
-        
+
+        let tip = self.tooltip_generator.generate_tooltip(
+            format!("CPU: {}%", value)
+        );
+        self.nid.szTip = tip;
+
+        self.nid.uFlags = NIF_ICON | NIF_TIP;
+
         self.current_value = value;
 
         unsafe {
-            winapi::um::shellapi::Shell_NotifyIconW(winapi::um::shellapi::NIM_MODIFY, &mut self.nid)
-        };
+            Shell_NotifyIconW(NIM_MODIFY, &mut self.nid);
+        }
     }
 }
 
@@ -89,7 +114,7 @@ impl TooltipGenerator {
 
                 tooltip_data
             }
-        };       
+        };
     }
 
     fn create_tooltip_inner(tooltip: &String) -> [u16; 128]{

@@ -1,7 +1,6 @@
 use image::{Rgba, RgbaImage};
 use imageproc::drawing::draw_text_mut;
-use image::imageops::resize;
-use rusttype::{Scale, Font};
+use ab_glyph::{FontRef, PxScale};
 use std::ptr::null_mut;
 
 use std::collections::HashMap;
@@ -31,16 +30,16 @@ impl IconGenerator {
         }
     }
 
-    fn scale_params(n: usize) -> ((i32, i32), Scale) {
+    fn scale_params(n: usize) -> ((i32, i32), PxScale) {
         match n {
             1 => {
-                ((5, -2), Scale { x: 30.0, y: 27.0 })
+                ((5, -2), PxScale { x: 30.0, y: 27.0 })
             }
             2 => {
-                ((-1, -2), Scale { x: 30.0, y: 27.0 })
+                ((-1, -2), PxScale { x: 30.0, y: 27.0 })
             }
             _ => {
-                ((-2,3), Scale { x: 20.0, y: 21.0 })
+                ((-2,3), PxScale { x: 20.0, y: 21.0 })
             }
         }
     }
@@ -50,7 +49,7 @@ impl IconGenerator {
 
         let mut image = RgbaImage::new(24, 24);
 
-        let font = Font::try_from_bytes(include_bytes!("fonts/OpenSans-Semibold.ttf")).unwrap();
+        let font = FontRef::try_from_slice(include_bytes!("fonts/OpenSans-Semibold.ttf")).unwrap();
 
         let scale_params = IconGenerator::scale_params(value_to_draw.len());
 
@@ -74,7 +73,8 @@ impl IconGenerator {
                 24,
             );
 
-            let bytes_raw = resized_image.into_raw().as_mut_ptr();
+            let mut bytes = resized_image.into_raw();
+            let bytes_raw = bytes.as_mut_ptr();
 
             let transmuted = std::mem::transmute::<*mut u8, *mut winapi::ctypes::c_void>(bytes_raw);
 
