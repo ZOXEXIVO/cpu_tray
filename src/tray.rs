@@ -69,9 +69,10 @@ impl TrayIcon {
         let tip = self.tooltip_generator.generate_tooltip(
             format!("CPU: {}%", value)
         );
+
         self.nid.szTip = tip;
 
-        self.nid.uFlags = NIF_ICON | NIF_TIP;
+        self.nid.uFlags = NIF_GUID | NIF_ICON | NIF_MESSAGE;
 
         self.current_value = value;
 

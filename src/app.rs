@@ -22,6 +22,7 @@ impl CpuApp {
         std::thread::spawn(move || {
             loop {
                 let cpu_load = Cpu::current_load();
+
                 if tx.send(cpu_load).is_err() {
                     break;
                 }
