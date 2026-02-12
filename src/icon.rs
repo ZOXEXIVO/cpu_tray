@@ -55,9 +55,15 @@ impl IconGenerator {
 
         let coord = scale_params.0;
 
+        let color = match value {
+            0..=39 => Rgba([255u8, 255u8, 255u8, 255u8]),
+            40..=79 => Rgba([0u8, 165u8, 255u8, 255u8]),
+            _ => Rgba([0u8, 0u8, 255u8, 255u8]),
+        };
+
         draw_text_mut(
             &mut image,
-            Rgba([255u8, 255u8, 255u8, 255u8]),
+            color,
             coord.0, coord.1,
             scale_params.1,
             &font,

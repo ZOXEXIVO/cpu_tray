@@ -72,7 +72,7 @@ impl TrayIcon {
 
         self.nid.szTip = tip;
 
-        self.nid.uFlags = NIF_GUID | NIF_ICON | NIF_MESSAGE;
+        self.nid.uFlags = NIF_GUID | NIF_ICON | NIF_MESSAGE | NIF_TIP;
 
         self.current_value = value;
 
