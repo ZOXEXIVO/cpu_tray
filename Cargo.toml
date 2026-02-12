@@ -14,3 +14,4 @@ ab_glyph = "0.2"
 raw-window-handle = "0.6"
 winit = "0.30.12"
 winapi = { version = "0.3.9", features = ["winuser","wincon","shellapi"] }
+winreg = "0.55.0"
