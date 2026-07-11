@@ -1,17 +1,24 @@
 [package]
 name = "cputray"
-version = "0.9.0"
+version = "1.0.0"
 description = "Display CPU load in Windows Tray"
 repository = "https://github.com/ZOXEXIVO/cpu_tray"
 authors = ["Artemov Ivan <zoxexivo@gmail.com>"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 cpu-monitor = "0.1.1"
-imageproc = "0.26.0"
-image = "0.25.9"
-ab_glyph = "0.2"
-raw-window-handle = "0.6"
-winit = "0.30.12"
-winapi = { version = "0.3.9", features = ["winuser","wincon","shellapi"] }
-winreg = "0.55.0"
+imageproc = "0.27.0"
+image = "0.25.10"
+ab_glyph = "0.2.32"
+winreg = "0.56.0"
+winapi = { version = "0.3.9", features = [
+    "winuser",
+    "shellapi",
+    "wingdi",
+    "libloaderapi",
+    "synchapi",
+    "errhandlingapi",
+    "winerror",
+    "handleapi",
+] }

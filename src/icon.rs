@@ -19,15 +19,10 @@ impl IconGenerator {
     }
 
     pub fn generate(&mut self, value: u8) -> GeneratedIcon {
-        if self.icon_cache.contains_key(&value) {
-            return self.icon_cache[&value];
-        } else {
-            let new_icon = IconGenerator::create_icon(value);
-
-            self.icon_cache.insert(value, new_icon);
-
-            new_icon
-        }
+        *self
+            .icon_cache
+            .entry(value)
+            .or_insert_with(|| IconGenerator::create_icon(value))
     }
 
     fn scale_params(n: usize) -> ((i32, i32), PxScale) {
@@ -73,19 +68,14 @@ impl IconGenerator {
         let resized_image = image; //resize(&mut image, 16, 16, image::imageops::FilterType::Lanczos3);
 
         unsafe {
-            let hbm_mask = winapi::um::wingdi::CreateCompatibleBitmap(
-                winapi::um::winuser::GetDC(null_mut()),
-                24,
-                24,
-            );
+            let screen_dc = winapi::um::winuser::GetDC(null_mut());
+            let hbm_mask = winapi::um::wingdi::CreateCompatibleBitmap(screen_dc, 24, 24);
 
             let mut bytes = resized_image.into_raw();
-            let bytes_raw = bytes.as_mut_ptr();
-
-            let transmuted = std::mem::transmute::<*mut u8, *mut winapi::ctypes::c_void>(bytes_raw);
+            let bits = bytes.as_mut_ptr() as *mut winapi::ctypes::c_void;
 
             let bitmap: winapi::shared::windef::HBITMAP =
-                winapi::um::wingdi::CreateBitmap(24, 24, 2, 16, transmuted);
+                winapi::um::wingdi::CreateBitmap(24, 24, 2, 16, bits);
 
             let mut h_icon = winapi::um::winuser::ICONINFO {
                 fIcon: 1,
@@ -95,7 +85,16 @@ impl IconGenerator {
                 yHotspot: 0,
             };
 
-            winapi::um::winuser::CreateIconIndirect(&mut h_icon)
+            let icon = winapi::um::winuser::CreateIconIndirect(&mut h_icon);
+
+            // CreateIconIndirect makes its own copy of the bitmaps, so the
+            // sources (and the screen DC) must be released to avoid leaking a
+            // GDI object on every generated icon.
+            winapi::um::wingdi::DeleteObject(bitmap as winapi::shared::windef::HGDIOBJ);
+            winapi::um::wingdi::DeleteObject(hbm_mask as winapi::shared::windef::HGDIOBJ);
+            winapi::um::winuser::ReleaseDC(null_mut(), screen_dc);
+
+            icon
         }
     }
 }
